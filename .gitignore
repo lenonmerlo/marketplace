@@ -17,3 +17,5 @@ logs
 .idea
 .vscode/*
 !.vscode/extensions.json
+
+/package-lock.json
