@@ -22,7 +22,12 @@ export async function create(req: Request, res: Response) {
   const body = createProductSchema.parse(req.body);
   if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
 
-  const data = await service.create(req.user.id, body);
+  const fixedBody = {
+    ...body,
+    category: body.category ?? '',
+  };
+
+  const data = await service.create(req.user.id, fixedBody);
   return res.status(201).json(data);
 }
 
