@@ -2,7 +2,7 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
-import { logger } from "./core/logger.ts";
+import { logger } from "./core/logger.js";
 import { routes } from "./routes/index.js";
 
 const app = express();
