@@ -1,0 +1,10 @@
+# build & deps
+dist/
+node_modules/
+
+# env
+.env
+.env.*
+
+# misc
+.DS_Store
