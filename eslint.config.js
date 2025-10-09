@@ -1,23 +1,37 @@
-import prettier from "eslint-config-prettier";
+import tseslint from '@typescript-eslint/eslint-plugin';
+import tsParser from '@typescript-eslint/parser';
 
-/** @type {import('eslint').Linter.FlatConfig[]} */
 export default [
-  {
-    ignores: [
-      "node_modules",
-      "dist",
-      "**/dist/**",
-      "pnpm-lock.yaml"
-    ],
-  },
-  {
-    files: ["**/*.{ts,tsx,js,jsx}"],
-    languageOptions: {
-      ecmaVersion: "latest",
-      sourceType: "module",
-    },
-    rules: {},
+ {
+    ignores: ['**/node_modules/**', '**/dist/**'],
   },
 
-  prettier,
+  {
+    files: ['apps/backend/**/*.{ts,tsx}'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        ecmaVersion: 2022,
+        sourceType: 'module',
+        project: false,
+      },
+    },
+    plugins: {
+      '@typescript-eslint': tseslint,
+    },
+    rules: {
+
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+    },
+  },
+
+
+  {
+    files: ['**/*.{js,cjs,mjs}'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+    },
+  },
 ];
