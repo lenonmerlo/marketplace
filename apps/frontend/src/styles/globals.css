@@ -1,3 +1,97 @@
+@import "tailwindcss";
+
+/* ================= THEME (Tailwind v4) ================= */
+@theme {
+  --color-orange-base: #F24D0D;
+  --color-orange-dark: #C43C08;
+
+  --color-blue-light: #D7EFF9;
+  --color-blue-base:  #5EC5FD;
+  --color-blue-dark:  #009CF0;
+
+  --color-white:      #FFFFFF;
+  --color-background: #FBF4F4; /* fundo da página */
+  --color-shape:      #FBF4F4; /* box do hero */
+
+  --color-gray-100: #ADADAD;
+  --color-gray-200: #949494;
+  --color-gray-300: #666666;
+  --color-gray-400: #3D3D3D;
+  --color-gray-500: #1D1D1D;
+
+  --color-danger:  #DC3545;
+  --color-success: #28A745;
+
+  --radius-xl: 28px; /* card de login */
+  --radius-md: 14px; /* botões/inputs */
+  --radius-sm: 8px;
+
+  --shadow-lg: 0 20px 60px rgba(0,0,0,.08);
+}
+
+/* ================= FONTS ================= */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Poppins:wght@400;500;600&display=swap');
+
+:root {
+  --font-title: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-body:  "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* ================= BASE ================= */
 * { box-sizing: border-box; }
-html, body, #root { height: 100%; margin: 0; }
-body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  background: var(--color-background);
+  color: var(--color-gray-500);
+  font-family: var(--font-body);
+}
+h1,h2,h3,h4 { font-family: var(--font-title); color: var(--color-gray-500); }
+img { max-width: 100%; height: auto; display: block; }
+
+/* ================= UTILITÁRIOS ================= */
+
+/* Botões */
+.btn { @apply inline-flex items-center justify-center gap-2 px-4 font-medium transition; }
+.btn-primary {
+  @apply h-[54px] rounded-[var(--radius-md)]
+         bg-[var(--color-orange-base)] text-white
+         hover:bg-[var(--color-orange-dark)]
+         disabled:opacity-60 disabled:cursor-not-allowed;
+}
+.btn-outline {
+  @apply h-[54px] rounded-[var(--radius-md)]
+         border-2 border-[var(--color-orange-base)]
+         text-[var(--color-orange-base)] bg-white
+         hover:bg-[var(--color-orange-base)]/5;
+}
+
+/* Input com linha inferior (Figma) */
+.input {
+  @apply w-full h-[52px]
+         bg-transparent
+         border-0 border-b border-[#E5E5E5]
+         px-0 outline-none
+         placeholder:text-[#B8B8B8]
+         focus:border-[var(--color-orange-base)];
+}
+
+/* Select no mesmo estilo do input (sem @apply de classe custom) */
+.select {
+  @apply w-full h-[52px]
+         bg-transparent
+         border-0 border-b border-[#E5E5E5]
+         px-0 outline-none
+         focus:border-[var(--color-orange-base)];
+}
+
+/* Cartões / superfícies */
+.card       { @apply bg-white rounded-[var(--radius-xl)] shadow-[var(--shadow-lg)]; }
+.login-card { @apply bg-white rounded-[var(--radius-xl)] p-8 shadow-[var(--shadow-lg)]; }
+
+/* Tipografia utilitária */
+.h1  { font-family: var(--font-title); font-weight: 700; font-size: 22px; }
+.sub { color: var(--color-gray-300); font-size: 14px; }
+
+/* Opcional: card com borda sutil */
+.card--bordered { @apply border border-[rgba(0,0,0,0.06)]; }
