@@ -1,61 +1,46 @@
-
 import BadgeStatus from "./BadgeStatus";
 
-type Props = {
+type ProductStatus = 'ANUNCIADO' | 'VENDIDO' | 'DESATIVADO';
+
+export type Product = {
+  id: string;
   title: string;
   price: number;
   description: string;
-  imageUrl?: string; // pode vir vazio/null do back
-  status: "ANUNCIADO" | "VENDIDO" | "DESATIVADO";
-  categoryLabel?: string;
+  image?: string;
+  status: ProductStatus;
+  isMobile?: boolean
 };
 
-export default function ProductCard({
-  title,
-  price,
-  description,
-  imageUrl,
-  status,
-  categoryLabel,
-}: Props) {
+type Props = { product: Product };
 
-  const src =
-    imageUrl && imageUrl.trim() !== ""
-      ? imageUrl
-      : "https://placehold.co/640x360?text=Produto";
+export default function ProductCard({ product }: Props) {
+  const { title, price, description, image, status, isMobile } = product;
+
+  const src = image && image.trim() !== '' ? image: 'https://placehold.co/640x360?text=Produto';
 
   return (
-    <article className="card overflow-hidden">
-      <div className="relative aspect-[16/9]">
-        <img
-          src={src}
-          alt={title}
-          className="h-full w-full object-cover"
-          loading="lazy"
-        />
-        <div className="absolute left-2 top-2 flex gap-2">
-          <BadgeStatus status={status} />
-          {categoryLabel && (
-            <span className="badge bg-[var(--color-gray-500)] text-white opacity-80">
-              {categoryLabel}
+    <article className="rounded-[16px] bg-white shadow-[0_20px_60px_rgba(0,0,0,0.08)] overflow-hidden">
+      <div className="relative">
+        <img src={src} alt={title} className="w-full h-[144px] object-cover" />
+        <div className="absolute right-3 top-3 flex gap-2">
+          <BadgeStatus status={status}/>
+          {isMobile && (
+            <span className="inline-flex items-center rounded-full px-2.5 py-[2px] text-[10px] font-semibold leading-none bg-[#534c4c]/80 text-white ">
+              MÓVEL
             </span>
           )}
         </div>
       </div>
 
       <div className="p-4">
-        <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-[var(--color-gray-500)]">
-            {title}
-          </h3>
-          <span className="font-semibold">
-            R${" "}
-            {price.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+        <header className="flex items-start justify-between gap-3">
+          <h3 className="font-semibold">{title}</h3>
+          <span className="text-sm font-semibold">
+            R$ {price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
           </span>
-        </div>
-        <p className="mt-1 text-sm text-[var(--color-gray-300)] line-clamp-2">
-          {description}
-        </p>
+        </header>
+        <p className="mt-2 text-[13px] text-[#6b7280] line-clamp-2">{description}</p>
       </div>
     </article>
   );
