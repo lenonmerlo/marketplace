@@ -7,6 +7,7 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import Private from './components/Private'
 import Placeholder from './components/Placeholder'
+import Dashboard from './pages/Dashboard'
 
 createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -18,6 +19,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/products" element={<Private><Placeholder title="Produtos" /></Private>} />
         <Route path="/products/new" element={<Private><Placeholder title="Novo Produto" /></Private>} />
         <Route path="/products/:id/edit" element={<Private><Placeholder title="Editar Produto" /></Private>} />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
