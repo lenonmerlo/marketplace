@@ -1,17 +1,12 @@
 import { useMemo, useState } from "react";
 import { PRODUCTS, type ProductStatus } from "../data/products";
 
-import Logo from "../assets/Logo.png";
-import Avatar from "../assets/avatar.png";
-import IconPlus from "../assets/icons/icon-plus.svg";
-import IconDash from "../assets/icons/chart-histogram.svg";
-import IconBox from "../assets/icons/package.svg";
 
 import IconSearch from "../assets/icons/search-01.svg";
 import IconArrowDown from "../assets/icons/arrow-down-01.svg";
 
-import NavTab from "../components/NavTab";
 import ProductCard from "../components/ProductCard";
+import AppHeader from "../components/AppHeader";
 
 const STATUS_OPTS: { label: string; value: ProductStatus | "TODOS" }[] = [
   { label: "Todos", value: "TODOS" },
@@ -38,32 +33,7 @@ export default function Products() {
   return (
     <main className="min-h-screen bg-[var(--color-background)]">
       {/* HEADER – igual ao Dashboard */}
-      <header className="h-20 flex items-center">
-        <div className="mx-auto w-full max-w-[1200px] px-4 flex items-center justify-between">
-          <img src={Logo} alt="Marketplace" className="h-10 w-auto" />
-
-          <nav className="hidden md:flex items-center gap-6">
-            <NavTab to="/dashboard" icon={<img src={IconDash} className="w-4 h-4" />}>
-              Dashboard
-            </NavTab>
-            <NavTab active icon={<img src={IconBox} className="w-4 h-4" />}>
-              Produtos
-            </NavTab>
-          </nav>
-
-          <div className="flex items-center gap-4">
-            <a
-              href="/products/new"
-              className="inline-flex items-center gap-2 h-10 px-4 rounded-[12px]
-                         bg-[var(--color-orange-base)] text-white hover:bg-[var(--color-orange-dark)]"
-            >
-              <img src={IconPlus} className="w-4 h-4 brightness-0 invert" />
-              <span>Novo produto</span>
-            </a>
-            <img src={Avatar} alt="Perfil" className="w-10 h-10 rounded-full object-cover" />
-          </div>
-        </div>
-      </header>
+      <AppHeader active="products" />
 
       {/* CONTEÚDO – 168px laterais, 238px de topo (Figma) */}
       <section className="mx-auto w-full max-w-none px-4 lg:px-[168px] pt-[64px] pb-10">

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import {
   LineChart,
   Line,
@@ -9,19 +8,15 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-import Logo from "../assets/Logo.png";
 import IconTag from "../assets/icons/icon-sell.svg";
 import IconStore from "../assets/icons/icon-store.svg";
 import IconUsers from "../assets/icons/icon-user.png";
-import IconPlus from "../assets/icons/icon-plus.svg";
-import Avatar from "../assets/avatar.png";
-import IconDash from "../assets/icons/chart-histogram.svg";
-import IconBox from "../assets/icons/package.svg";
 
 import { fetchVisitorsLast30d } from "../api/metrics";
 import type { VisitorsPoint } from "../data/visitors";
 import StatCard from "../components/StatCard";
-import NavTab from "../components/NavTab";
+
+import AppHeader from "../components/AppHeader";
 
 export default function Dashboard() {
   const [data, setData] = useState<VisitorsPoint[]>([]);
@@ -32,43 +27,7 @@ export default function Dashboard() {
 
   return (
     <main className="min-h-screen bg-[var(--color-background)]">
-      <header className="h-20 flex items-center">
-        <div className="mx-auto w-full max-w-none px-4 lg:px-[168px] flex items-center justify-between">
-          <img src={Logo} alt="Marketplace" className="h-10 w-auto" />
-
-          <nav className="hidden md:flex items-center gap-6">
-            <NavTab active icon={<img src={IconDash} className="w-4 h-4" />}>
-              Dashboard
-            </NavTab>
-            <NavTab
-              to="/products"
-              icon={<img src={IconBox} className="w-4 h-4" />}
-            >
-              Produtos
-            </NavTab>
-          </nav>
-
-          <div className="flex items-center gap-4">
-            <Link
-              to="/products/new"
-              className="inline-flex items-center gap-2 h-10 px-4 rounded-[12px] bg-[var(--color-orange-base)] text-white hover:bg-[var(--color-orange-dark)]"
-            >
-              <img
-                src={IconPlus}
-                alt=""
-                className="w-4 h-4 brightness-0 invert"
-              />
-              <span>Novo produto</span>
-            </Link>
-
-            <img
-              src={Avatar}
-              alt="Perfil"
-              className="w-10 h-10 rounded-full object-cover"
-            />
-          </div>
-        </div>
-      </header>
+      <AppHeader active="dashboard" />
 
       <section className="mx-auto w-full max-w-none px-4 lg:px-[168px] pb-12">
         <div className="mb-10">
