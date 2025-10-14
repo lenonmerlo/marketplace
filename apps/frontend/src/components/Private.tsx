@@ -1,7 +1,9 @@
 import { Navigate } from 'react-router-dom'
-import type { PropsWithChildren } from 'react'
+import { useAuth } from '../hooks/useAuth'
 
-export default function Private({ children }: PropsWithChildren) {
-  const token = localStorage.getItem('accessToken')
-  return token ? <>{children}</> : <Navigate to="/login" replace />
+export default function Private({ children }: { children: React.ReactNode }) {
+  const { isAuth, loading } = useAuth()
+  if (loading) return null
+  if (!isAuth) return <Navigate to="/login" replace />
+  return <>{children}</>
 }
