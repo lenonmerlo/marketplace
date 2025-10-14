@@ -19,3 +19,4 @@ logs
 !.vscode/extensions.json
 
 /package-lock.json
+apps/backend/uploads/

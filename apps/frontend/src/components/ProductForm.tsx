@@ -1,115 +1,150 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { createProduct, updateProduct, listCategories } from "../api/products";
 import ImagePicker from "./ImagePicker";
 
-export type ProductFormValues = {
-  title: string;
-  description: string;
-  price: string;    
-  category: string;
-  imageFile?: File | null;
-  imageUrl?: string | null; 
+const schema = z.object({
+  title: z.string().min(2),
+  description: z.string().min(2),
+  price: z.union([z.number(), z.string()]),
+  categoryId: z.string().min(1),
+});
+type FormData = z.infer<typeof schema>;
+
+type Initial = {
+  id?: string;
+  title?: string;
+  description?: string;
+  price?: number | string;
+  categoryId?: string;
+  imageUrl?: string | null;
 };
 
-type Props = {
-  initial?: Partial<ProductFormValues>;
-  onSubmit: (values: ProductFormValues) => void;
-  submitLabel?: string;        
-  onCancel?: () => void;
-};
+export default function ProductForm({
+  initial,
+  onSuccess,
+}: {
+  initial?: Initial;
+  onSuccess?: () => void;
+}) {
+  const [file, setFile] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [categories, setCategories] = useState<Array<{ id: string; name: string }>>([]);
 
-export default function ProductForm({ initial = {}, onSubmit, submitLabel = "Salvar e publicar", onCancel }: Props) {
-  const [f, setF] = useState<ProductFormValues>({
-    title: initial.title ?? "",
-    description: initial.description ?? "",
-    price: initial.price ?? "",
-    category: initial.category ?? "Móvel",
-    imageFile: null,
-    imageUrl: initial.imageUrl ?? null,
-  });
-
-  function handlePick(file: File) {
-    setF(s => ({ ...s, imageFile: file, imageUrl: URL.createObjectURL(file) }));
-  }
-
-  function submit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!f.title.trim()) return alert("Informe o título");
-    if (!f.price.trim()) return alert("Informe o valor");
-    onSubmit(f);
-  }
-
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-[415px_minmax(0,1fr)] gap-8">
-      <ImagePicker previewUrl={f.imageUrl ?? null} onPick={handlePick} />
-
-      <form onSubmit={submit} className="rounded-[20px] bg-white shadow-[0_20px_60px_rgba(0,0,0,0.08)] p-6">
-        <h2 className="text-[16px] font-semibold text-[var(--color-gray-500)] mb-6">Dados do produto</h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_240px] gap-6">
-          <div>
-            <Label>TÍTULO</Label>
-            <input
-              className="input"
-              placeholder="Ex.: Sofá"
-              value={f.title}
-              onChange={(e) => setF(s => ({ ...s, title: e.target.value }))}
-            />
-          </div>
-
-          <div>
-            <Label>VALOR</Label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#7a7a7a]">R$</span>
-              <input
-                className="input pl-10"
-                inputMode="decimal"
-                placeholder="0,00"
-                value={f.price}
-                onChange={(e) => setF(s => ({ ...s, price: e.target.value }))}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-6">
-          <Label>DESCRIÇÃO</Label>
-          <textarea
-            className="textarea min-h-[152px]"  
-            rows={6}
-            placeholder="Detalhes do produto…"
-            value={f.description}
-            onChange={(e) => setF(s => ({ ...s, description: e.target.value }))}
-          />
-        </div>
-
-        <div className="mt-6">
-          <Label>CATEGORIA</Label>
-          <select
-            className="select appearance-none"
-            value={f.category}
-            onChange={(e) => setF(s => ({ ...s, category: e.target.value }))}
-          >
-            <option>Móvel</option>
-            <option>Vestuário</option>
-            <option>Beleza</option>
-            <option>Brinquedos</option>
-            <option>Eletrônicos</option>
-          </select>
-        </div>
-
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <button type="button" onClick={onCancel} className="btn btn-outline w-full">Cancelar</button>
-          <button type="submit" className="btn btn-primary w-full">{submitLabel}</button>
-        </div>
-      </form>
-    </div>
+  const defaults = useMemo<FormData>(
+    () => ({
+      title: initial?.title ?? "",
+      description: initial?.description ?? "",
+      price: typeof initial?.price === "number" ? (initial!.price / 100) : (initial?.price ?? ""),
+      categoryId: initial?.categoryId ?? "",
+    }),
+    [initial]
   );
-}
 
-function Label({ children }: { children: React.ReactNode }) {
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
+  resolver: zodResolver(schema),
+  defaultValues: defaults,
+  mode: "onChange",
+});
+
+  useEffect(() => {
+    let active = true;
+    listCategories().then((cats) => { if (active) setCategories(cats); }).catch(() => {});
+    return () => { active = false; };
+  }, []);
+
+  async function onSubmit(values: FormData) {
+    setLoading(true);
+    setError(null);
+    try {
+      const priceCents =
+        typeof values.price === "string"
+          ? Math.round(parseFloat(values.price.replace(",", ".")) * 100)
+          : Math.round(values.price * 100);
+
+      if (initial?.id) {
+        await updateProduct(initial.id, {
+          title: values.title,
+          description: values.description,
+          priceCents,
+          categoryId: values.categoryId,
+          imageFile: file ?? undefined,
+          imageUrl: initial.imageUrl ?? null,
+        });
+      } else {
+        await createProduct({
+          title: values.title,
+          description: values.description,
+          priceCents,
+          categoryId: values.categoryId,
+          imageFile: file,
+        });
+      }
+      onSuccess?.();
+    } catch {
+      setError("Falha ao salvar produto");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
-    <label className="block text-[12px] tracking-[.12em] text-[#6b7280] mb-2 uppercase">
-      {children}
-    </label>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <div>
+        <label className="block text-sm mb-2">Imagem</label>
+        <ImagePicker onChange={setFile} initialUrl={initial?.imageUrl ?? undefined} />
+      </div>
+
+      <div>
+        <label className="block text-sm mb-2">Título</label>
+        <input className="input" {...register("title")} placeholder="Título do produto" />
+        {errors.title && <p className="text-sm text-red-600 mt-1">{errors.title.message as string}</p>}
+      </div>
+
+      <div>
+        <label className="block text-sm mb-2">Descrição</label>
+        <textarea className="input min-h-[96px]" {...register("description")} placeholder="Descrição" />
+        {errors.description && <p className="text-sm text-red-600 mt-1">{errors.description.message as string}</p>}
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm mb-2">Valor (R$)</label>
+          <input
+            className="input"
+            type="number"
+            step="0.01"
+            inputMode="decimal"
+            {...register("price")}
+            placeholder="0,00"
+          />
+          {errors.price && <p className="text-sm text-red-600 mt-1">Valor inválido</p>}
+        </div>
+        <div>
+          <label className="block text-sm mb-2">Categoria</label>
+          <select className="select w-full" {...register("categoryId")}>
+            <option value="">Selecione</option>
+            {categories.map((c) => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
+          {errors.categoryId && <p className="text-sm text-red-600 mt-1">{errors.categoryId.message as string}</p>}
+        </div>
+      </div>
+
+      {error && <p className="text-sm text-red-600">{error}</p>}
+
+      <div className="flex gap-3">
+        <button type="submit" disabled={isSubmitting || loading} className="btn btn-primary">
+          {initial?.id ? "Salvar alterações" : "Salvar e Publicar"}
+        </button>
+        <button type="button" className="btn btn-outline" onClick={() => history.back()}>
+          Cancelar
+        </button>
+      </div>
+    </form>
   );
 }

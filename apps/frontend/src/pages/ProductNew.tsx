@@ -1,24 +1,19 @@
+// apps/frontend/src/pages/ProductNew.tsx
 import { useNavigate } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import PageTitleBar from "../components/PageTitleBar";
-import ProductForm, { type ProductFormValues } from "../components/ProductForm";
+import ProductForm from "../components/ProductForm";
 
 export default function ProductNew() {
-  const nav = useNavigate();
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  function handleSubmit(_values: ProductFormValues) {
-    // TODO: integrar com backend (FormData)
-    alert("Produto cadastrado (mock) ✅");
-    nav("/products");
-  }
-
+  const navigate = useNavigate();
   return (
     <main className="min-h-screen bg-[var(--color-background)]">
-      <AppHeader active="products" showNewButton={false} />
-      <section className="mx-auto w-full max-w-none px-4 lg:px-[168px] pt-[64px] pb-12">
-        <PageTitleBar backTo="/products" title="Novo produto" subtitle="Preencha as informações para cadastrar" />
-        <ProductForm onSubmit={handleSubmit} onCancel={() => nav("/products")} submitLabel="Salvar e publicar" />
+      <AppHeader active="products" />
+      <section className="mx-auto w-full px-4 lg:px-[168px] pt-[64px] pb-10">
+        <PageTitleBar title="Novo produto" onBack={() => navigate(-1)} />
+        <div className="mt-6 rounded-[28px] bg-white shadow-[0_20px_60px_rgba(0,0,0,0.08)] p-6 md:p-8">
+          <ProductForm onSuccess={() => navigate("/products")} />
+        </div>
       </section>
     </main>
   );
