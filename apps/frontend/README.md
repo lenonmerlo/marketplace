@@ -1,73 +1,134 @@
-# React + TypeScript + Vite
+# Marketplace — Front-end (Vite + React + Tailwind v4)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interface do **Marketplace** (painel do vendedor) construída em React + Vite + Tailwind v4.
 
-Currently, two official plugins are available:
+## ⚙️ Requisitos
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Node 18+
+- npm/pnpm (usamos **pnpm** no monorepo, mas o front funciona com npm também)
+- Backend rodando em `http://localhost:3000` (ver README da raiz)
 
-## React Compiler
+## 🌱 Setup rápido
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Crie o `.env` do front:
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(["dist"]),
-  {
-    files: ["**/*.{ts,tsx}"],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
+```bash
+cp apps/frontend/.env.example apps/frontend/.env
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Conteúdo sugerido:
 
-```js
-// eslint.config.js
-import reactX from "eslint-plugin-react-x";
-import reactDom from "eslint-plugin-react-dom";
-
-export default defineConfig([
-  globalIgnores(["dist"]),
-  {
-    files: ["**/*.{ts,tsx}"],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs["recommended-typescript"],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
+```env
+VITE_API_BASE_URL=http://localhost:3000/api
 ```
+
+> Dica: após alterar o `.env`, reinicie o Vite.
+
+## ▶️ Rodar em desenvolvimento
+
+```bash
+# via pnpm (recomendado no monorepo)
+pnpm --filter @apps/frontend dev
+
+# ou via npm dentro de apps/frontend
+cd apps/frontend
+npm install
+npm run dev
+```
+
+Acesse: `http://localhost:5173`
+
+## 🧩 Funcionalidades entregues
+
+- **Autenticação** (Login) com validação (zod + RHF)
+- **Rotas privadas** (Dashboard, Products, Product New/Edit)
+- **Listagem de produtos** com filtro por **texto** e **status**
+- **Cadastro de produto** com **upload de imagem**
+- **Cards e formatação de preço (BRL)**
+- **Mensagem secreta**: mantenha o mouse por **7s** no botão **“Novo produto”** e aparece o tooltip especial
+- Layout e componentes de acordo com o Figma (AppHeader, NavTab, ProductCard, ProductForm etc.)
+
+## 🔌 Integração com API
+
+- Base URL configurada por `VITE_API_BASE_URL` (ex.: `http://localhost:3000/api`)
+- Interceptor do Axios injeta `Authorization: Bearer <token>` lido do `localStorage` (`authToken`)
+- Upload é feito via `FormData` no campo **`image`**
+- API responde `imageUrl` **absoluta** (ex.: `http://localhost:3000/uploads/<arquivo>.jpg`)
+
+## 🖼️ Imagens
+
+O back serve as imagens em `/uploads` e o Helmet está configurado para permitir **cross-origin**:
+
+```ts
+helmet({ crossOriginResourcePolicy: false });
+```
+
+No front, há normalização de `imageUrl` para lidar com dados legados (placeholder quando necessário).
+
+## 🧪 Como testar rápido
+
+1. Faça login (ou use usuário seed, ver README raiz)
+2. Vá em **Produtos**
+3. Crie um novo produto em **Novo produto**, selecione uma imagem e salve
+4. A imagem deve aparecer no card; preços formatados em BRL
+
+## 🗂️ Estrutura principal
+
+```
+apps/frontend/
+  src/
+    api/
+      client.ts
+      products.ts
+    assets/
+    components/
+      AppHeader.tsx
+      NavTab.tsx
+      ProductCard.tsx
+      ProductForm.tsx
+      ...
+    hooks/
+    pages/
+      Login.tsx
+      Dashboard.tsx
+      Products.tsx
+      ProductNew.tsx
+      ProductEdit.tsx
+    styles/
+      globals.css
+    utils/
+      formatBRL.ts
+      normalizeImageUrl.ts
+  index.html
+  package.json
+  tailwind.config.js (v4)
+```
+
+## 🧱 Build
+
+```bash
+pnpm --filter @apps/frontend build
+# ou
+cd apps/frontend && npm run build
+```
+
+Saída em `apps/frontend/dist`.
+
+## 🚀 Deploy (resumo)
+
+- Vercel/Netlify servindo `dist`
+- Configure `VITE_API_BASE_URL` apontando para o back em produção (ex.: Render)
+- Se usar cookies no futuro, ajustar CORS/credentials no back
+
+## 📝 Decisões
+
+- Token no header (Bearer) via LocalStorage (sem cookies)
+- Preço decimal vindo do back; formatado em BRL no front
+- Upload com `FormData` → back retorna `imageUrl` absoluta
+
+## 📌 Roadmap curto
+
+- Estados de loading/empty/error
+- Edição de produto (GET/:id + PUT/:id com upload opcional)
+- Popular categorias via `GET /categories`
+- Testes de componentes (vitest + RTL)
