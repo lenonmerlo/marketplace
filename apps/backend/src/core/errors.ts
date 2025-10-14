@@ -2,6 +2,7 @@ import { error } from "console";
 import type { Request, Response, NextFunction } from "express";
 
 export class AppError extends Error {
+    [x: string]: number;
     status: number;
     constructor(message: string, status = 400) {
         super(message);
