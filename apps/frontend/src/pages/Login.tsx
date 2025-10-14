@@ -9,7 +9,6 @@ import Bg from "../assets/Background.png";
 import IconMail from "../assets/icons/icon-mail.png";
 import IconPass from "../assets/icons/icon-password.png";
 import view from "../assets/icons/view.png";
-import { useAuth } from "../hooks/useAuth";
 
 const schema = z.object({
   email: z.string().email("E-mail inválido"),
@@ -28,15 +27,9 @@ export default function Login() {
     resolver: zodResolver(schema),
   });
 
-  const { login } = useAuth();
-
-  const onSubmit = async (form: FormData) => {
-    try {
-      await login(form.email, form.password);
-      navigate("/products"); // ou /dashboard
-    } catch {
-      setError("password", { message: "E-mail ou senha inválidos" });
-    }
+  const onSubmit = async (_data: FormData) => {
+    // TODO: integrar com /auth/login
+    navigate("/products");
   };
 
   return (
@@ -45,7 +38,7 @@ export default function Login() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
           {/* ESQUERDA */}
           <section className="md:col-span-7">
-           
+            {/* apenas a marca (texto já na imagem) */}
             <div className="mb-8">
               <img
                 src={Title}
@@ -54,7 +47,7 @@ export default function Login() {
               />
             </div>
 
-        
+            {/* hero box na mesma cor do fundo do PNG */}
             <div className="relative rounded-[28px] bg-[var(--color-shape)] p-4 md:p-6 overflow-hidden">
               <img
                 src={Bg}
@@ -82,7 +75,7 @@ export default function Login() {
                     E-MAIL
                   </label>
                   <div className="relative">
-                    
+                    {/* reserva de área para o ícone */}
                     <span className="absolute left-0 top-1/2 -translate-y-1/2 w-8 h-8 grid place-items-center opacity-70">
                       <img src={IconMail} alt="" className="w-5 h-5" />
                     </span>
@@ -118,7 +111,7 @@ export default function Login() {
                       className="input pl-14 pr-10"
                     />
 
-                  
+                    {/* olhinho */}
                     <button
                       type="button"
                       onClick={() => setShowPass((v) => !v)}
@@ -138,7 +131,7 @@ export default function Login() {
 
                 {/* BOTÕES E TEXTOS */}
                 <div className="space-y-5">
-                 
+                  {/* Acessar — com seta à direita */}
                   <button
                     type="submit"
                     disabled={isSubmitting}
@@ -148,7 +141,7 @@ export default function Login() {
                     <ArrowRight className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5" />
                   </button>
 
-                  
+                  {/* Texto + Cadastrar com seta */}
                   <div className="mt-[131px]">
                     <p className="text-sm text-[#6b7280] mt-5 mb-">
                       Ainda não tem uma conta?
@@ -171,7 +164,7 @@ export default function Login() {
   );
 }
 
-
+/* Seta minimalista (SVG inline) */
 function ArrowRight({ className = "" }: { className?: string }) {
   return (
     <svg
@@ -196,8 +189,3 @@ function ArrowRight({ className = "" }: { className?: string }) {
     </svg>
   );
 }
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function setError(_arg0: string, _arg1: { message: string; }) {
-  throw new Error("Function not implemented.");
-}
-
