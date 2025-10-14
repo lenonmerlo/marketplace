@@ -4,7 +4,6 @@ import { api } from "../api/client";
 
 import IconSearch from "../assets/icons/search-01.svg";
 import IconArrowDown from "../assets/icons/arrow-down-01.svg";
-
 import ProductCard from "../components/ProductCard";
 import AppHeader from "../components/AppHeader";
 
@@ -39,7 +38,18 @@ export default function Products() {
       if (q) params.search = q;
       if (status !== "TODOS") params.status = status;
       const { data } = await api.get("/products", { params });
-      setItems(data.items ?? data);
+      const raw = data.items ?? data;
+      setItems(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        raw.map((p: any) => ({
+          ...p,
+          price: 
+            typeof p.price === "string"
+              ? Math.round(parseFloat(p.price) * 100)
+              : p.price,
+          categoryName: p.category?.name ?? p.category ?? "",
+        }))
+      );
     } catch {
       setError("Falha ao carregar produtos");
     } finally {
