@@ -7,6 +7,7 @@ import ToyCar from "../assets/product-car-toy.png";
 
 export type ProductStatus = "ANUNCIADO" | "VENDIDO" | "DESATIVADO";
 export type Product = {
+  [x: string]: string | null | undefined;
   id: string;
   title: string;
   price: number;

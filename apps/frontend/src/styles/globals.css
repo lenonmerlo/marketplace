@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* ================= FONTS ================= */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Poppins:wght@400;500;600&display=swap');
+
+
+
 /* ================= THEME (Tailwind v4) ================= */
 @theme {
   --color-orange-base: #F24D0D;
@@ -29,13 +34,11 @@
   --shadow-lg: 0 20px 60px rgba(0,0,0,.08);
 }
 
-/* ================= FONTS ================= */
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Poppins:wght@400;500;600&display=swap');
-
 :root {
   --font-title: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-body:  "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
+
 
 /* ================= BASE ================= */
 * { box-sizing: border-box; }

@@ -12,9 +12,9 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 },
 });
 
-export const productsRouter = Router();
+const uploadSingle: RequestHandler = upload.single("image") as unknown as RequestHandler;
 
-const uploadSingle = upload.single("image") as unknown as RequestHandler;
+export const productsRouter = Router();
 
 productsRouter.get("/", authGuard, ctrl.list);
 productsRouter.get("/:id", authGuard, ctrl.get);

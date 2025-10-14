@@ -39,6 +39,7 @@ export default function Register() {
   const { register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } =
     useForm<FormData>({ resolver: zodResolver(schema) })
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onSubmit = async (_data: FormData) => {
     // TODO: POST /auth/register
     nav('/login')
