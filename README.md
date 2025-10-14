@@ -2,6 +2,10 @@
 
 Monorepo do **Marketplace** contendo:
 
+## Demo em vídeo
+
+[Assista ao demo (MP4)](./docs/demo.mp4)
+
 - **apps/backend** — API Node/Express + Prisma + PostgreSQL (upload de imagens via Multer)
 - **apps/frontend** — React + Vite + Tailwind v4
 
