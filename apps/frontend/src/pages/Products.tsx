@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
-import { PRODUCTS, type ProductStatus } from "../data/products";
-
+import { useEffect, useMemo, useState } from "react";
+import { type ProductStatus } from "../data/products";
+import { api } from "../api/client";
 
 import IconSearch from "../assets/icons/search-01.svg";
 import IconArrowDown from "../assets/icons/arrow-down-01.svg";
@@ -15,27 +15,48 @@ const STATUS_OPTS: { label: string; value: ProductStatus | "TODOS" }[] = [
   { label: "Desativado", value: "DESATIVADO" },
 ];
 
+type Product = {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  status: ProductStatus;
+  imageUrl?: string | null;
+};
+
 export default function Products() {
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<ProductStatus | "TODOS">("TODOS");
+  const [items, setItems] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const list = useMemo(() => {
-    return PRODUCTS.filter((p) => {
-      const qMatch =
-        !q ||
-        p.title.toLowerCase().includes(q.toLowerCase()) ||
-        p.description.toLowerCase().includes(q.toLowerCase());
-      const sMatch = status === "TODOS" ? true : p.status === status;
-      return qMatch && sMatch;
-    });
+  async function load() {
+    setLoading(true);
+    setError(null);
+    try {
+      const params: Record<string, string> = {};
+      if (q) params.search = q;
+      if (status !== "TODOS") params.status = status;
+      const { data } = await api.get("/products", { params });
+      setItems(data.items ?? data);
+    } catch {
+      setError("Falha ao carregar produtos");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [q, status]);
+
+  const list = useMemo(() => items, [items]);
 
   return (
     <main className="min-h-screen bg-[var(--color-background)]">
-      {/* HEADER – igual ao Dashboard */}
       <AppHeader active="products" />
-
-      {/* CONTEÚDO – 168px laterais, 238px de topo (Figma) */}
       <section className="mx-auto w-full max-w-none px-4 lg:px-[168px] pt-[64px] pb-10">
         <header className="mb-6">
           <h1 className="text-[24px] font-bold leading-[120%]">Seus produtos</h1>
@@ -44,14 +65,11 @@ export default function Products() {
           </p>
         </header>
 
-        {/* grid: filtro fixo 327px + cards */}
         <div className="grid grid-cols-1 lg:grid-cols-[327px_minmax(0,1fr)] gap-x-6">
-          {/* FILTRO */}
           <aside className="mb-6 lg:mb-0">
             <h2 className="text-[14px] font-semibold mb-4">Filtrar</h2>
 
-            <div className="space-y-6">{/* 24px entre campos  */}
-              {/* Pesquisar */}
+            <div className="space-y-6">
               <div>
                 <label className="sr-only">Pesquisar</label>
                 <div className="relative">
@@ -67,7 +85,6 @@ export default function Products() {
                 </div>
               </div>
 
-              {/* Status */}
               <div>
                 <label className="sr-only">Status</label>
                 <div className="relative">
@@ -88,20 +105,22 @@ export default function Products() {
                 </div>
               </div>
 
-              <button className="btn btn-primary w-full">Aplicar filtro</button>
+              <button onClick={load} className="btn btn-primary w-full">Aplicar filtro</button>
+
+              {loading && <p className="text-sm text-gray-600">Carregando...</p>}
+              {error && <p className="text-sm text-red-600">{error}</p>}
             </div>
           </aside>
 
-          {/* CARDS – 16px entre cards  */}
           <section className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {list.map((p) => (
-                <ProductCard
-                  key={p.id}
-                  product={p}
-                />
+                <ProductCard key={p.id} product={p} />
               ))}
             </div>
+            {!loading && !error && list.length === 0 && (
+              <p className="text-sm text-gray-600">Nenhum produto encontrado.</p>
+            )}
           </section>
         </div>
       </section>
